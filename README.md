@@ -41,13 +41,16 @@ uv sync
 | 变量 | 必填 | 说明 | 默认值 |
 |------|------|------|--------|
 | `OBSIDIAN_VAULT_PATH` | ✅ | Obsidian vault 的绝对路径 | — |
-| `EMBEDDING_PROVIDER` | | `openai`（OpenAI 兼容）\| `ollama` \| `fake` | `openai` |
-| `EMBEDDING_BASE_URL` | | OpenAI 兼容 API 地址 / Ollama 地址 | `https://api.openai.com/v1` / `http://localhost:11434` |
-| `EMBEDDING_MODEL` | | Embedding 模型名 | `text-embedding-3-small` / `nomic-embed-text` |
-| `EMBEDDING_API_KEY` | openai 时必填 | API Key | — |
+| `EMBEDDING_BASE_URL` | | Embedding API 地址（Ollama 用 `http://localhost:11434`） | 无地址且无 key 时为离线测试模式 |
+| `EMBEDDING_MODEL` | | Embedding 模型名 | `text-embedding-3-small`（OpenAI 兼容） |
+| `EMBEDDING_API_KEY` | OpenAI 兼容时必填 | API Key（Ollama 本地无需） | — |
 | `OBSIDIAN_INDEX_PATH` | | 索引文件保存位置 | `~/.obsidian-rag/index.json` |
 | `OBSIDIAN_CHUNK_SIZE` | | 分块字符数 | `1500` |
 | `OBSIDIAN_MAX_NOTES` | | 最多索引的笔记数 | `1000` |
+
+> **后端自动识别**：只需配置地址 + 模型 + key，无需指定 provider。
+> 地址含 Ollama 默认端口 `11434` 或以 `/api` 结尾 → 自动按 Ollama 调用；
+> 其他地址 → 自动按 OpenAI 兼容 `POST {base}/embeddings` 调用。
 
 ### 3. 在 goose 中注册扩展
 
@@ -67,7 +70,6 @@ extensions:
       - obsidian-rag-mcp
     envs:
       OBSIDIAN_VAULT_PATH: "D:/path/to/your/vault"
-      EMBEDDING_PROVIDER: "openai"
       EMBEDDING_BASE_URL: "https://api.openai.com/v1"
       EMBEDDING_MODEL: "text-embedding-3-small"
       EMBEDDING_API_KEY: "<你的 key>"
@@ -106,7 +108,6 @@ uv run --directory . pytest
 **OpenAI 兼容 API（如自建代理 / 中转）**
 
 ```bash
-export EMBEDDING_PROVIDER=openai
 export EMBEDDING_BASE_URL=https://your-gateway/v1
 export EMBEDDING_MODEL=text-embedding-3-small
 export EMBEDDING_API_KEY=sk-xxx
@@ -116,15 +117,14 @@ export EMBEDDING_API_KEY=sk-xxx
 
 ```bash
 ollama pull nomic-embed-text
-export EMBEDDING_PROVIDER=ollama
 export EMBEDDING_BASE_URL=http://localhost:11434
 export EMBEDDING_MODEL=nomic-embed-text
 ```
 
-**假模式（演示 / 测试，无需网络）**
+**离线测试模式（无需网络 / 无需 key）**
 
 ```bash
-export EMBEDDING_PROVIDER=fake
+# 什么都不配置即可（检测不到地址和 key 时自动进入该模式）
 ```
 
 ## 📂 项目结构

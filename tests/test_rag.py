@@ -86,6 +86,23 @@ def make_settings(vault: Path, tmp_path: Path) -> Settings:
 
 
 # --------------------------------------------------------------------------- #
+# Provider auto-detection
+# --------------------------------------------------------------------------- #
+def test_detect_provider():
+    from obsidian_rag.config import detect_provider
+
+    # Ollama: default port or /api path
+    assert detect_provider("http://localhost:11434", None, None) == "ollama"
+    assert detect_provider("http://192.168.1.5:11434/api", "x", None) == "ollama"
+    # OpenAI-compatible endpoint
+    assert detect_provider("https://ai.example.org/v1", "sk-1", None) == "openai"
+    # No URL + no key -> offline fake
+    assert detect_provider("", None, None) == "fake"
+    # No URL + key -> OpenAI official
+    assert detect_provider("", "sk-1", None) == "openai"
+    # Explicit override wins
+    assert detect_provider("http://localhost:11434", None, "openai") == "openai"
+    assert detect_provider("https://ai.example.org/v1", "sk-1", "ollama") == "ollama"
 # Vault scanning
 # --------------------------------------------------------------------------- #
 def test_scan_vault_skips_hidden_dirs(vault: Path):

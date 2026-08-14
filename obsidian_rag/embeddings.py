@@ -44,7 +44,8 @@ class EmbeddingClient:
     def _embed_openai(self, texts: list[str]) -> list[list[float]]:
         if not self.settings.api_key:
             raise EmbeddingError(
-                "EMBEDDING_API_KEY is required when EMBEDDING_PROVIDER=openai"
+                "EMBEDDING_API_KEY is required when using an OpenAI-compatible "
+                "embedding endpoint"
             )
         url = f"{self.settings.base_url}/embeddings"
         headers = {

@@ -1,0 +1,28 @@
+version: "1.0.0"
+title: "Obsidian RAG 分析"
+description: "基于 Obsidian 笔记库对用户内容进行 RAG 检索与分析。先索引笔记，再语义检索相关片段，结合笔记内容分析用户的输入。"
+parameters:
+  - key: content
+    input_type: string
+    requirement: user_prompt
+    description: "用户想要分析的内容或问题（例如：帮我看看我对 X 的想法，结合我的笔记分析）"
+
+prompt: |
+  用户希望基于其 Obsidian 笔记库分析以下内容：
+
+  {{ content }}
+
+  请严格按以下步骤执行：
+
+  1. 调用 `obsidian_index_status` 检查索引是否存在且与当前 embedding 模型匹配。
+     - 若未索引或模型不匹配：调用 `obsidian_index`（force=false）建立索引；若返回错误，将错误原样告知用户并停止。
+  2. 调用 `obsidian_rag`（question 为上文的用户内容，top_k=8）从笔记库检索最相关的上下文片段。
+  3. 结合检索到的笔记内容分析用户的输入：
+     - 指出笔记中与用户内容直接相关的信息（观点、事实、截止日期、决策、偏好等）；
+     - 指出笔记中的相关事项与用户内容的关联、佐证或冲突；
+     - 基于笔记内容给出补充建议或需要注意的风险；
+     - 若检索结果与用户内容无关，明确说明并建议用户调整描述。
+  4. 输出格式要求：
+     - 用中文回复；
+     - 每条引用标注来源笔记路径（如 `Projects/Website.md`）与相似度分数；
+     - 明确区分「笔记中的事实」与「你的推断」。

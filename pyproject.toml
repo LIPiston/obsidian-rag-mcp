@@ -1,7 +1,7 @@
 [project]
 name = "obsidian-rag-mcp"
 version = "0.1.0"
-description = "MCP server for RAG over an Obsidian vault — bring your notes into goose"
+description = "MCP server for RAG over an Obsidian vault — works with any MCP client"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [

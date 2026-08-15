@@ -1,13 +1,15 @@
 """Configuration for obsidian-rag-mcp.
 
 All settings are read from environment variables so they can be supplied via
-the MCP extension's environment configuration (``envs``) when registering the
-server with goose.
+the MCP client's environment configuration (``env`` in JSON configs, ``envs``
+in goose's YAML) when registering the server (Claude Desktop, Cursor, ZCode,
+goose, ...).
 
 You only need three embedding settings:
   EMBEDDING_BASE_URL   URL of the embedding API
   EMBEDDING_MODEL      model name
   EMBEDDING_API_KEY    API key (only for OpenAI-compatible endpoints)
+  EMBEDDING_PROVIDER   optional override: openai | ollama | fake
 
 The backend is detected automatically from EMBEDDING_BASE_URL:
   - port 11434 or a path ending in /api  -> Ollama
@@ -24,7 +26,7 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# Env var names (also used by the goose MCP extension config)
+# Env var names (also used by the MCP client's server config)
 ENV_VAULT_PATH = "OBSIDIAN_VAULT_PATH"
 ENV_BASE_URL = "EMBEDDING_BASE_URL"
 ENV_MODEL = "EMBEDDING_MODEL"

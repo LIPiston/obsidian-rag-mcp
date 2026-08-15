@@ -1,17 +1,18 @@
 """obsidian-rag MCP server.
 
 Run with:
-    uv run obsidian-rag-mcp            # stdio transport (for goose)
-    uv run obsidian-rag-mcp --transport sse   # SSE (for testing in browsers)
+    uv run obsidian-rag-mcp                            # stdio (default, works with any MCP client)
+    uv run obsidian-rag-mcp --transport sse            # SSE
+    uv run obsidian-rag-mcp --transport streamable-http  # HTTP
 
-Required environment variables (set when registering the extension in goose):
+Required environment variables (set by the MCP client when registering the server):
     OBSIDIAN_VAULT_PATH   absolute path to the Obsidian vault
 
-Embedding configuration:
-    EMBEDDING_PROVIDER    "openai" (default, OpenAI-compatible) | "ollama"
+Embedding configuration (backend is auto-detected from EMBEDDING_BASE_URL):
     EMBEDDING_BASE_URL    OpenAI-compatible base URL or Ollama host
     EMBEDDING_MODEL       model name
-    EMBEDDING_API_KEY     API key (required for "openai")
+    EMBEDDING_API_KEY     API key (only for OpenAI-compatible endpoints)
+    EMBEDDING_PROVIDER    optional override: openai | ollama | fake
 """
 
 from __future__ import annotations
@@ -239,12 +240,13 @@ def main(argv: list[str] | None = None) -> None:
         print(
             "obsidian-rag MCP server\n"
             "Usage:\n"
-            "  obsidian-rag-mcp                 run over stdio (default)\n"
-            "  obsidian-rag-mcp --transport sse run over SSE\n"
-            "  obsidian-rag-mcp --check         validate configuration\n"
+            "  obsidian-rag-mcp                            run over stdio (default)\n"
+            "  obsidian-rag-mcp --transport sse            run over SSE\n"
+            "  obsidian-rag-mcp --transport streamable-http  run over HTTP\n"
+            "  obsidian-rag-mcp --check                    validate configuration\n"
             "Environment:\n"
-            "  OBSIDIAN_VAULT_PATH (required), EMBEDDING_PROVIDER,\n"
-            "  EMBEDDING_BASE_URL, EMBEDDING_MODEL, EMBEDDING_API_KEY,\n"
+            "  OBSIDIAN_VAULT_PATH (required), EMBEDDING_BASE_URL,\n"
+            "  EMBEDDING_MODEL, EMBEDDING_API_KEY, EMBEDDING_PROVIDER (optional),\n"
             "  OBSIDIAN_INDEX_PATH, OBSIDIAN_CHUNK_SIZE, OBSIDIAN_MAX_NOTES"
         )
         return

@@ -62,8 +62,6 @@ uv sync
 uv run --directory D:/path/to/obsidian-rag-mcp obsidian-rag-mcp
 ```
 
-**ZCode** —— 编辑 `~/.zcode/cli/config.json`（用户级）或 `<repo>/.zcode/config.json`（项目级）的 `mcp.servers`：
-
 ```json
 {
   "mcp": {
@@ -83,65 +81,6 @@ uv run --directory D:/path/to/obsidian-rag-mcp obsidian-rag-mcp
 }
 ```
 
-**Claude Desktop** —— 编辑 `claude_desktop_config.json`（Windows: `%APPDATA%\Claude\claude_desktop_config.json`）：
-
-```json
-{
-  "mcpServers": {
-    "obsidian-rag": {
-      "command": "uv",
-      "args": ["run", "--directory", "D:/path/to/obsidian-rag-mcp", "obsidian-rag-mcp"],
-      "env": {
-        "OBSIDIAN_VAULT_PATH": "D:/path/to/your/vault",
-        "EMBEDDING_BASE_URL": "https://api.openai.com/v1",
-        "EMBEDDING_MODEL": "text-embedding-3-small",
-        "EMBEDDING_API_KEY": "<你的 key>"
-      }
-    }
-  }
-}
-```
-
-**Cursor** —— 编辑 `.cursor/mcp.json`（项目级）：
-
-```json
-{
-  "mcpServers": {
-    "obsidian-rag": {
-      "command": "uv",
-      "args": ["run", "--directory", "D:/path/to/obsidian-rag-mcp", "obsidian-rag-mcp"],
-      "env": {
-        "OBSIDIAN_VAULT_PATH": "D:/path/to/your/vault",
-        "EMBEDDING_BASE_URL": "https://api.openai.com/v1",
-        "EMBEDDING_MODEL": "text-embedding-3-small",
-        "EMBEDDING_API_KEY": "<你的 key>"
-      }
-    }
-  }
-}
-```
-
-**Goose** —— 在 `config.yaml`（Windows: `%APPDATA%\Block\goose\config\config.yaml`）的 `extensions` 下添加：
-
-```yaml
-extensions:
-  obsidian-rag:
-    type: stdio
-    name: obsidian-rag
-    enabled: true
-    cmd: uv
-    args:
-      - run
-      - --directory
-      - "D:/path/to/obsidian-rag-mcp"
-      - obsidian-rag-mcp
-    envs:
-      OBSIDIAN_VAULT_PATH: "D:/path/to/your/vault"
-      EMBEDDING_BASE_URL: "https://api.openai.com/v1"
-      EMBEDDING_MODEL: "text-embedding-3-small"
-      EMBEDDING_API_KEY: "<你的 key>"
-    timeout: 300
-```
 
 > 其他 MCP 客户端（VS Code、Claude Code、Windsurf……）的注册格式大同小异，都是 `command` + `args` + `env` 三段式，照抄上面的结构即可。
 
@@ -149,52 +88,6 @@ extensions:
 
 注册并重启会话后，AI 会自动决定何时调用工具。你可以直接说：
 > 「用我的 Obsidian 笔记分析一下这个方案的可行性」「检索我笔记里关于网站改版的内容」
-
-## 🐦 Goose 专用：`/obsidian-rag` 命令（可选）
-
-[`recipes/obsidian-rag.yaml`](recipes/obsidian-rag.yaml) 是一个 **goose 专属**的 slash command recipe，其他客户端无需也不支持此文件。
-
-如果你用 goose，在 `config.yaml` 中添加：
-
-```yaml
-slash_commands:
-  - command: "obsidian-rag"
-    recipe_path: "D:/path/to/obsidian-rag-mcp/recipes/obsidian-rag.yaml"
-```
-
-重启会话后，在对话中输入 `/obsidian-rag 帮我分析一下我对新项目的想法` 即可。不用 goose 的话直接忽略 `recipes/` 目录。
-
-## 🔬 本地测试
-
-```bash
-uv run --directory . pytest
-```
-
-测试使用内置 `fake` embedding（确定性哈希向量），**无需任何 API Key 和网络**即可端到端验证整个 RAG 流程（扫描 → 分块 → 索引 → 检索 → MCP 调用）。
-
-## 💡 Embedding 配置示例
-
-**OpenAI 兼容 API（如自建代理 / 中转）**
-
-```bash
-export EMBEDDING_BASE_URL=https://your-gateway/v1
-export EMBEDDING_MODEL=text-embedding-3-small
-export EMBEDDING_API_KEY=sk-xxx
-```
-
-**Ollama 本地模型**
-
-```bash
-ollama pull nomic-embed-text
-export EMBEDDING_BASE_URL=http://localhost:11434
-export EMBEDDING_MODEL=nomic-embed-text
-```
-
-**离线测试模式（无需网络 / 无需 key）**
-
-```bash
-# 什么都不配置即可（检测不到地址和 key 时自动进入该模式）
-```
 
 ## 📂 项目结构
 

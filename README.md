@@ -145,7 +145,26 @@ extensions:
 
 > 其他 MCP 客户端（VS Code、Claude Code、Windsurf……）的注册格式大同小异，都是 `command` + `args` + `env` 三段式，照抄上面的结构即可。
 
-### 4. 使用
+### 4. Hermes：按需启动与空闲回收（可选）
+
+Hermes 可以在宿主侧管理本 MCP 的生命周期：启动 Hermes 时不启动服务，第一次调用工具时再按需拉起；连续空闲后自动回收进程。该能力属于 **Hermes 的 MCP 配置**，不是本项目服务器代码的一部分。
+
+将 MCP 注册为 `obsidian-rag` 后，在 Hermes 配置中启用：
+
+```yaml
+mcp_servers:
+  obsidian-rag:
+    enabled: true
+    lazy: true
+    idle_timeout_seconds: 300
+```
+
+- `lazy: true`：首次实际调用本 MCP 工具时才启动服务。
+- `idle_timeout_seconds: 300`：连续 300 秒未调用后关闭服务进程；下次调用会自动重启。
+
+不要将 API Key 提交到仓库；请继续将其放在本机 MCP 配置的 `env` 中。修改配置后重启 Hermes 会话使其生效。
+
+### 5. 使用
 
 注册并重启会话后，AI 会自动决定何时调用工具。你可以直接说：
 > 「用我的 Obsidian 笔记分析一下这个方案的可行性」「检索我笔记里关于网站改版的内容」
